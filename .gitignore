@@ -1,0 +1,133 @@
+# ENVIRONMENT & SECRETS
+.env
+.env.*
+!.env.example
+!.env.template
+
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+credentials/
+*.secret
+*_secret.*
+service-account*.json
+*-credentials.json
+
+# PYTHON
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Type checking / linters
+.mypy_cache/
+.pyre/
+.ruff_cache/
+.pytype/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# NODE / REACT / VITE
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+.npm/
+.yarn/
+.pnpm-store/
+
+dist/
+build/
+.vite/
+.cache/
+
+# IDE / EDITORS
+.vscode/
+.idea/
+*.iml
+
+# VS Code local settings
+.history/
+
+# OS FILES
+.DS_Store
+.DS_Store?
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# LOGS
+*.log
+logs/
+
+# DATABASES / LOCAL DATA
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+
+# LOCAL / GENERATED DATA
+data/
+tmp/
+temp/
+cache/
+caches/
+
+# ML generated files
+models/
+checkpoints/
+runs/
+wandb/
+mlruns/
+
+# GENERATED OUTPUTS
+outputs/
+artifacts/
+reports/
+generated/
+
+# UPLOADS
+uploads/
+media/
+
+# DOCKER
+docker-compose.override.yml
+
+# MAC / WINDOWS
+.AppleDouble
+.LSOverride
+
+# Windows thumbnail cache
+Thumbs.db
+
+# LOCAL CONFIG
+*.local
+*.local.*
+config.local.*
