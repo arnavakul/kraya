@@ -1,5 +1,6 @@
 package com.kraya.organization.service;
 
+import com.kraya.common.exception.ResourceNotFoundException;
 import com.kraya.organization.dto.CreateOrganizationRequest;
 import com.kraya.organization.dto.OrganizationResponse;
 import com.kraya.organization.entity.Organization;
@@ -63,7 +64,7 @@ public class OrganizationService {
 
         Organization organization = organizationRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Organization not found: " + id)
+                         new ResourceNotFoundException("Organization not found: " + id)
                 );
 
         return toResponse(organization);
