@@ -19,11 +19,13 @@ public class Organization {
     @Column(name = "trade_name", length = 255)
     private String tradeName;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "organization_type", nullable = false, length = 30)
-    private String organizationType;
+    private OrganizationType organizationType;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 30)
-    private String status;
+    private OrganizationStatus status;
 
     @Column(name = "country_code", nullable = false, length = 2)
     private String countryCode;
@@ -97,19 +99,19 @@ public class Organization {
         this.tradeName = tradeName;
     }
 
-    public String getOrganizationType() {
+    public OrganizationType getOrganizationType() {
         return organizationType;
     }
 
-    public void setOrganizationType(String organizationType) {
+    public void setOrganizationType(OrganizationType organizationType) {
         this.organizationType = organizationType;
     }
 
-    public String getStatus() {
+    public OrganizationStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrganizationStatus status) {
         this.status = status;
     }
 
