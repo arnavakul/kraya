@@ -8,6 +8,7 @@ import com.kraya.organization.entity.OrganizationStatus;
 import com.kraya.organization.repository.OrganizationRepository;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import com.kraya.common.exception.ConflictException;
 
 import java.util.UUID;
 
@@ -22,6 +23,12 @@ public class OrganizationService {
 
     @Transactional
     public OrganizationResponse create(CreateOrganizationRequest request) {
+
+        if (organizationRepository.existsByPrimaryEmailIgnoreCase(request.primaryEmail())) {
+            throw new ConflictException(
+                    "Organization with this email already exists"
+            );
+        }
 
         Organization organization = new Organization();
 

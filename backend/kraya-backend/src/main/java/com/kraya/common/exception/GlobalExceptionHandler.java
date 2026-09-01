@@ -38,4 +38,18 @@ public class GlobalExceptionHandler {
                         "message", "An unexpected error occurred"
                 ));
     }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<Map<String, Object>> handleConflict(
+            ConflictException exception) {
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(Map.of(
+                        "timestamp", OffsetDateTime.now(),
+                        "status", 409,
+                        "error", "CONFLICT",
+                        "message", exception.getMessage()
+                ));
+    }
 }
