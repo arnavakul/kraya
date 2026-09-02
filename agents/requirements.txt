@@ -21,3 +21,9 @@ openpyxl
 faker
 uvicorn
 pytest
+fastapi
+pydantic
+xgboost
+shap
+scikit-learn
+joblib
