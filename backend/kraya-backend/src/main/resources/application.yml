@@ -1,3 +1,8 @@
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.hibernate.SQL: DEBUG
+
 spring:
   application:
     name: kraya-backend
@@ -22,9 +27,14 @@ spring:
 
 server:
   port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+    include-stacktrace: always
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info
+
+
