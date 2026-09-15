@@ -10,7 +10,7 @@ from agents.pydantic_models.evaluation_schemas import (
     EvaluationResponse
 )
 
-# Feature display label mapping for UI rendering
+
 FEATURE_LABELS = {
     "price_variance_pct": "Price vs. Budget Target",
     "tco_markup_pct": "Additional Landed Costs (TCO)",
@@ -26,15 +26,15 @@ FEATURE_LABELS = {
 
 class ShapEvaluationEngine:
     def __init__(self, model_path: str = "agents/models/evaluation_xgb_v1.bin"):
-        # Load the trained XGBoost model
+        
         self.model = joblib.load(model_path)
-        # Initialize SHAP TreeExplainer
+        
         self.explainer = shap.TreeExplainer(self.model)
 
     def _prepare_dataframe(self, feature_vector: FeatureVector) -> pd.DataFrame:
         data = feature_vector.model_dump()
         
-        # Apply default neutral imputations if historical metrics are missing (Cold-Start)
+       
         if data["historical_delay_avg_days"] is None:
             data["historical_delay_avg_days"] = 0.0
         if data["historical_defect_rate"] is None:
@@ -50,16 +50,16 @@ class ShapEvaluationEngine:
     ) -> EvaluationResponse:
         df_input = self._prepare_dataframe(feature_vector)
         
-        # 1. Run XGBoost Prediction
+        
         raw_score = float(self.model.predict(df_input)[0])
         final_score = round(float(np.clip(raw_score, 0.0, 100.0)), 2)
         
-        # 2. Calculate SHAP Values
+        
         shap_values = self.explainer(df_input)
         base_value = round(float(shap_values.base_values[0]), 2)
         feature_shaps = shap_values.values[0]
         
-        # 3. Process and Rank Feature Drivers
+        
         positive_drivers: List[FeatureImpact] = []
         negative_drivers: List[FeatureImpact] = []
         
@@ -67,7 +67,7 @@ class ShapEvaluationEngine:
             val_str = str(df_input[col_name].iloc[0])
             score_delta = round(float(shap_val), 2)
             
-            # Skip negligible feature impacts
+            
             if abs(score_delta) < 0.1:
                 continue
                 
@@ -84,7 +84,7 @@ class ShapEvaluationEngine:
             else:
                 negative_drivers.append(impact)
                 
-        # Sort drivers by absolute impact magnitude
+        
         positive_drivers.sort(key=lambda x: x.score_delta, reverse=True)
         negative_drivers.sort(key=lambda x: x.score_delta)
         
