@@ -38,3 +38,7 @@ management:
         include: health,info
 
 
+jwt:
+  secret: "ATxt;FLHdIh,o;.5h#T)xZnsfC}:n02J"
+  expiration: 86400000
+

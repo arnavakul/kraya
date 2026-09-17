@@ -130,3 +130,7 @@ Thumbs.db
 *.local
 *.local.*
 config.local.*
+
+# JAVA / MAVEN
+target/
+*.class
