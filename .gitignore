@@ -101,7 +101,6 @@ cache/
 caches/
 
 # ML generated files
-models/
 checkpoints/
 runs/
 wandb/
