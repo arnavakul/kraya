@@ -87,3 +87,31 @@ dd{margin:0;color:var(--text);text-align:right;font-variant-numeric:tabular-nums
 :root[data-theme="light"] .theme .sun{display:block}
 @media (max-width:720px){nav ul{display:none}nav{justify-content:space-between}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.auth-loading{position:relative;z-index:1;min-height:100vh;display:grid;place-items:center;color:var(--muted)}
+
+/* ---------- login / signup ---------- */
+.login-page{position:relative;z-index:1;min-height:100vh;display:grid;place-items:center;padding:24px 20px}
+.login-card{width:100%;max-width:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:32px;display:grid;gap:6px}
+.login-card .logo{display:inline-block;margin-bottom:8px}
+.login-card h1{margin:8px 0 0;font-size:1.7rem;letter-spacing:-.02em}
+.login-card h1 + p{margin:0 0 14px;color:var(--muted)}
+.login-card form{display:grid;gap:6px}
+.login-card label{margin-top:10px;color:var(--muted);font-size:.85rem}
+.login-card input{width:100%;background:var(--field);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font:inherit}
+.login-card input::placeholder{color:var(--muted);opacity:.7}
+.login-error{margin:8px 0 0;color:#e5484d;font-size:.9rem}
+.login-submit{margin-top:16px;width:100%}
+.login-back{margin-top:10px;width:100%}
+.signup-prompt{margin:14px 0 0;text-align:center}
+.signup-link{background:none;border:0;padding:6px;cursor:pointer;color:var(--lime);font:inherit}
+.signup-link:hover{text-decoration:underline}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-row > div{display:grid;gap:6px}
+.auth-loading{position:relative;z-index:1;min-height:100vh;display:grid;place-items:center;color:var(--muted)}
+
+/* ---------- signup extras ---------- */
+.login-card select{width:100%;background:var(--field);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:14px 16px;font:inherit}
+.signup-card{max-width:480px}
+.signup-name-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.signup-name-row > div{display:grid;gap:6px}

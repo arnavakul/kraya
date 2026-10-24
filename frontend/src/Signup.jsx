@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import './styles/kraya.css';
 
@@ -50,7 +49,6 @@ export default function Signup({ onBack, onSignup }) {
       });
     } catch (err) {
       setError(err.message || 'Unable to create your account.');
-    } finally {
       setLoading(false);
     }
   }
@@ -150,7 +148,7 @@ export default function Signup({ onBack, onSignup }) {
             onChange={updateField}
             autoComplete="new-password"
             minLength={8}
-            maxLength={100}
+            maxLength={72}
             required
           />
 
@@ -163,7 +161,7 @@ export default function Signup({ onBack, onSignup }) {
             onChange={updateField}
             autoComplete="new-password"
             minLength={8}
-            maxLength={100}
+            maxLength={72}
             required
           />
 
@@ -173,23 +171,19 @@ export default function Signup({ onBack, onSignup }) {
             </p>
           )}
 
-          <button
-            className="btn login-submit"
-            type="submit"
-            disabled={loading}
-          >
+          <button className="btn login-submit" type="submit" disabled={loading}>
             {loading ? 'Creating account…' : 'Create account'}
           </button>
         </form>
 
         <p className="signup-prompt">
-            <button
-                type="button"
-                className="signup-link signup-link-full"
-                onClick={onBack}
-            >
-                Already have an account? Log in
-            </button>
+          <button
+            type="button"
+            className="signup-link signup-link-full"
+            onClick={onBack}
+          >
+            Already have an account? Log in
+          </button>
         </p>
       </section>
     </main>

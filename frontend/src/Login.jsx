@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import './styles/kraya.css';
 
@@ -64,10 +63,6 @@ export default function Login({ onBack, onLogin, onSignupClick}) {
             {loading ? 'Signing in…' : 'Log in'}
           </button>
         </form>
-
-        <button className="btn ghost login-back" type="button" onClick={onBack}>
-          Back to dashboard
-        </button>
 
         <p className="signup-prompt">
             <button

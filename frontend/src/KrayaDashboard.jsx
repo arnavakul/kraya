@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAuth } from './auth/AuthProvider';
 import './styles/kraya.css';
   
 /* ---------- data (replace with TanStack Query: GET /api/v1/requests/:id/quotes) ---------- */
@@ -71,6 +72,8 @@ function ThemeToggle({ theme, onToggle }) {
 }
 
 function Header({ theme, onToggleTheme }) {
+  const { user, logout } = useAuth();
+
   return (
     <header>
       <nav aria-label="Primary">
@@ -85,6 +88,7 @@ function Header({ theme, onToggleTheme }) {
         <ThemeToggle theme={theme} onToggle={onToggleTheme} />
         <button className="btn ghost" type="button">Ask Kraya</button>
         <button className="btn" type="button">New request</button>
+        <button className="btn ghost" type="button" onClick={logout} title={user?.email}>Log out</button>
       </nav>
     </header>
   );
