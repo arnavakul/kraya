@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useAuth } from './auth/AuthProvider';
 import './styles/kraya.css';
   
 /* ---------- data (replace with TanStack Query: GET /api/v1/requests/:id/quotes) ---------- */
@@ -70,25 +71,54 @@ function ThemeToggle({ theme, onToggle }) {
   );
 }
 
+// In src/KrayaDashboard.jsx: replace your whole `function Header(...) { ... }` with this.
+// (useState/useEffect are already imported there; useAuth too, from the logout step.)
+
 function Header({ theme, onToggleTheme }) {
+  const { user, logout } = useAuth();
+  const [open, setOpen] = useState(false);
+
+  // Escape closes the mobile menu
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
+
   return (
-    <header>
+    <header className={open ? 'nav-open' : undefined}>
       <nav aria-label="Primary">
         <a className="logo" href="#">KRAYA<span>.</span></a>
-        <ul>
-          <li><a href="#" aria-current="page">Requests</a></li>
-          <li><a href="#quotes">Quotes</a></li>
-          <li><a href="#">Suppliers</a></li>
-          <li><a href="#">Approvals</a></li>
-          <li><a href="#activity">Audit</a></li>
-        </ul>
+
+        <div className="nav-menu" id="nav-menu">
+          <ul onClick={() => setOpen(false)}>
+            <li><a href="#" aria-current="page">Requests</a></li>
+            <li><a href="#quotes">Quotes</a></li>
+            <li><a href="#">Suppliers</a></li>
+            <li><a href="#">Approvals</a></li>
+            <li><a href="#activity">Audit</a></li>
+          </ul>
+          <div className="nav-actions">
+            <button className="btn ghost" type="button">Ask Kraya</button>
+            <button className="btn" type="button">New request</button>
+            <button className="btn ghost" type="button" onClick={logout} title={user?.email}>Log out</button>
+          </div>
+        </div>
+
         <ThemeToggle theme={theme} onToggle={onToggleTheme} />
-        <button className="btn ghost" type="button">Ask Kraya</button>
-        <button className="btn" type="button">New request</button>
+
+        <button className="nav-burger" type="button"
+                aria-label={open ? 'Close menu' : 'Open menu'}
+                aria-expanded={open} aria-controls="nav-menu"
+                onClick={() => setOpen((o) => !o)}>
+          {open ? '✕' : '☰'}
+        </button>
       </nav>
     </header>
   );
 }
+
 
 function StageStepper({ current }) {
   return (

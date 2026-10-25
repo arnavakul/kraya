@@ -24,6 +24,8 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+    schemas: public
+    create-schemas: true
 
 server:
   port: ${SERVER_PORT:8080}
@@ -39,6 +41,10 @@ management:
 
 
 jwt:
-  secret: "ATxt;FLHdIh,o;.5h#T)xZnsfC}:n02J"
-  expiration: 86400000
+  secret: ${JWT_SECRET}
+  expiration: 900000
 
+kraya:
+  auth:
+    refresh-token-days: 7
+    cookie-secure: false
