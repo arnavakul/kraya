@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import shap
 from typing import Dict, Any, List
-from agents.pydantic_models.evaluation_schemas import (
+from pydantic_models.evaluation_schemas import (
     FeatureVector,
     FeatureImpact,
     ShapBreakdown,
