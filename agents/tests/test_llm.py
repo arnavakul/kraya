@@ -11,5 +11,4 @@ def test_gemini_connection():
     )
 
     print(response.content)
-
     assert response.content
