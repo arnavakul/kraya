@@ -48,3 +48,10 @@ kraya:
   auth:
     refresh-token-days: 7
     cookie-secure: false
+
+kraya:
+  auth:
+    refresh-token-days: 7
+    cookie-secure: false
+  agents:
+    evaluation-url: ${EVALUATION_AGENT_URL:http://localhost:8000}
