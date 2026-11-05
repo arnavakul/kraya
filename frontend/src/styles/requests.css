@@ -83,3 +83,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .rq-timeline li{display:grid;grid-template-columns:auto 1fr;gap:12px}
 .rq-dot{width:10px;height:10px;margin-top:7px;border-radius:50%;background:var(--lime)}
 .rq-time{color:var(--muted);font-size:.85rem}
+
+@media (min-width: 721px) {
+  .nav-actions a.btn:not(.ghost) { display: none; }
+}

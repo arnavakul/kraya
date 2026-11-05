@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Outlet } from 'react-router-dom';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../auth/AuthProvider';
 import { canManage } from '../lib/permissions';
@@ -9,8 +9,15 @@ import ThemeToggle from './ThemeToggle';
 export default function AppLayout() {
   const { user, logout } = useAuth();
   const queryClient = useQueryClient();
+  const location = useLocation();
   const [theme, toggleTheme] = useTheme();
   const [open, setOpen] = useState(false);
+
+  // The page's own "New ..." button is the main action on its list page, so the header one is for other pages.
+  const onSuppliers = location.pathname.startsWith('/suppliers');
+  const newLink = onSuppliers
+    ? { to: '/suppliers/new', label: 'New supplier' }
+    : { to: '/requests/new', label: 'New request' };
 
   // Escape closes the mobile menu
   useEffect(() => {
@@ -36,10 +43,11 @@ export default function AppLayout() {
           <div className="nav-menu" id="nav-menu">
             <ul onClick={close}>
               <li><NavLink to="/requests">Requests</NavLink></li>
+              <li><NavLink to="/suppliers">Suppliers</NavLink></li>
             </ul>
             <div className="nav-actions">
               {canManage(user) && (
-                <Link className="btn" to="/requests/new" onClick={close}>New request</Link>
+                <Link className="btn" to={newLink.to} onClick={close}>{newLink.label}</Link>
               )}
               <button className="btn ghost" type="button" onClick={handleLogout} title={user?.email}>
                 Log out
