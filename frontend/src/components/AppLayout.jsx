@@ -42,6 +42,7 @@ export default function AppLayout() {
 
           <div className="nav-menu" id="nav-menu">
             <ul onClick={close}>
+              <li><NavLink to="/dashboard">Dashboard</NavLink></li>
               <li><NavLink to="/requests">Requests</NavLink></li>
               <li><NavLink to="/suppliers">Suppliers</NavLink></li>
             </ul>
