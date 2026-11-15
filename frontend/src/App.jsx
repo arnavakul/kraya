@@ -8,7 +8,12 @@ import Signup from './Signup';
 import RequestList from './pages/RequestList';
 import RequestForm from './pages/RequestForm';
 import RequestDetail from './pages/RequestDetail';
+import Dashboard from './pages/Dashboard';
+import SupplierList from './pages/SupplierList';
+import SupplierForm from './pages/SupplierForm';
+import SupplierDetail from './pages/SupplierDetail';
 import './styles/requests.css';
+import './styles/suppliers.css';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,11 +74,18 @@ export default function App() {
 
             <Route element={<RequireAuth />}>
               <Route element={<AppLayout />}>
-                <Route index element={<Navigate to="/requests" replace />} />
+                <Route index element={<Navigate to="/dashboard" replace />} />
+
+                <Route path="dashboard" element={<Dashboard />} />
                 <Route path="requests" element={<RequestList />} />
                 <Route path="requests/new" element={<RequestForm />} />
                 <Route path="requests/:id" element={<RequestDetail />} />
                 <Route path="requests/:id/edit" element={<RequestForm />} />
+
+                <Route path="suppliers" element={<SupplierList />} />
+                <Route path="suppliers/new" element={<SupplierForm />} />
+                <Route path="suppliers/:id" element={<SupplierDetail />} />
+                <Route path="suppliers/:id/edit" element={<SupplierForm />} />
               </Route>
             </Route>
 
