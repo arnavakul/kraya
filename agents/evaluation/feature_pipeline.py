@@ -4,7 +4,7 @@ import pandas as pd
 from pydantic import BaseModel, Field
 
 # Exact feature order expected by the trained XGBoost model and TreeSHAP explainer
-FEATURE_COLUMNS: List[str] = [
+FEATURE_COLUMNS: List[str] =[
     "price_variance_pct",
     "tco_markup_pct",
     "lead_time_days_delta",
