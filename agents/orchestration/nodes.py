@@ -5,6 +5,13 @@ from agents.supplier_discovery.agent import (
     run_supplier_discovery_agent
 )
 
+from agents.rfq_drafting.agent import (
+    run_rfq_drafting_agent
+)
+
+from pydantic_models.requirement import Requirement
+from pydantic_models.supplier_candidate import SupplierCandidate
+
 
 def intake_node(state: dict) -> dict:
 
@@ -37,4 +44,39 @@ def supplier_discovery_node(state: dict) -> dict:
         "supplier_candidates": result_data["suppliers"],
         "discovery_status": result_data["status"],
         "current_agent": "supplier_discovery"
+    }
+
+
+
+def rfq_drafting_node(state: dict) -> dict:
+
+    requirement = Requirement.model_validate(
+        state["requirement"]
+    )
+
+    # Extract supplier objects from discovery assessments
+    suppliers = [
+        SupplierCandidate.model_validate(
+            assessment["supplier"]
+        )
+        for assessment in state.get("supplier_candidates", [])
+    ]
+
+    result = run_rfq_drafting_agent(
+        requirement=requirement,
+        suppliers=suppliers
+    )
+
+    result_data = result.model_dump(mode="json")
+
+    return {
+        "rfq_drafting_result": result_data,
+        "rfq_drafts": result_data["rfq_drafts"],
+        "rfq_drafting_status": result_data["status"],
+        "current_agent": "rfq_drafting",
+        "workflow_status": (
+            "pending_approval"
+            if result_data["successful_drafts"] > 0
+            else "rfq_drafting_failed"
+        )
     }

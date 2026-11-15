@@ -20,6 +20,11 @@ class ProcurementState(TypedDict, total=False):
     supplier_candidates: list[dict]
     discovery_status: str
 
+    # RFQ Drafting Agent
+    rfq_drafting_result: Optional[dict]
+    rfq_drafts: list[dict]
+    rfq_drafting_status: str
+
     # Workflow tracking
     current_agent: str
     workflow_status: str
