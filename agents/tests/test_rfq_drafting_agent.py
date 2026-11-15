@@ -35,13 +35,8 @@ def test_rfq_agent_generates_draft(mock_email):
 
     mock_email.return_value = {
         "email_subject": "RFQ - 20 Laptops",
-        "email_body": """
-        Product: Laptop
-        Quantity: 20
-        Specifications: Intel i7, 16GB RAM, 512GB SSD
-        Delivery location: Kolkata
-        Mandatory constraint: 3-year warranty
-        """
+        "opening_message": "Dear Supplier, please review our procurement requirement.",
+        "closing_message": "Please submit your quotation at your earliest convenience."
     }
 
     result = run_rfq_drafting_agent(

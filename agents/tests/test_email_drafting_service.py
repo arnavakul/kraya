@@ -10,11 +10,14 @@ from tools.rfq.email_drafting_service import (
 @patch("tools.rfq.email_drafting_service.get_llm")
 def test_draft_rfq_email(mock_get_llm):
 
-    mock_structured_llm = mock_get_llm.return_value.with_structured_output.return_value
+    mock_structured_llm = (
+        mock_get_llm.return_value.with_structured_output.return_value
+    )
 
     mock_structured_llm.invoke.return_value = RFQEmailContent(
         email_subject="RFQ - 20 Laptops",
-        email_body="Please provide your quotation for 20 laptops."
+        opening_message="Dear Supplier, please review our requirement.",
+        closing_message="We look forward to your quotation."
     )
 
     result = draft_rfq_email({
@@ -24,24 +27,28 @@ def test_draft_rfq_email(mock_get_llm):
     })
 
     assert result["email_subject"] == "RFQ - 20 Laptops"
-    assert "20 laptops" in result["email_body"]
+    assert "Dear Supplier" in result["opening_message"]
+    assert "quotation" in result["closing_message"]
 
     mock_get_llm.assert_called_once_with(temperature=0)
 
 
 @patch("tools.rfq.email_drafting_service.get_llm")
-def test_reject_empty_email_body(mock_get_llm):
+def test_reject_empty_opening_message(mock_get_llm):
 
-    mock_structured_llm = mock_get_llm.return_value.with_structured_output.return_value
+    mock_structured_llm = (
+        mock_get_llm.return_value.with_structured_output.return_value
+    )
 
     mock_structured_llm.invoke.return_value = RFQEmailContent(
         email_subject="RFQ - Laptops",
-        email_body="   "
+        opening_message="   ",
+        closing_message="Please send your quotation."
     )
 
     try:
         draft_rfq_email({"product_service": "Laptop"})
         assert False, "Expected ValueError"
-    except ValueError as error:
-        assert "body is empty" in str(error)
 
+    except ValueError as error:
+        assert "Opening message is empty" in str(error)

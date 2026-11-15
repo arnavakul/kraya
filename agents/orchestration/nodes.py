@@ -1,82 +1,67 @@
 
-from agents.intake.agent import run_intake_agent
+from langgraph.graph import StateGraph, START, END
+from langgraph.checkpoint.memory import InMemorySaver
 
-from agents.supplier_discovery.agent import (
-    run_supplier_discovery_agent
+from orchestration.state import ProcurementState
+
+from orchestration.nodes import (
+    intake_node,
+    supplier_discovery_node,
+    rfq_drafting_node
 )
 
-from agents.rfq_drafting.agent import (
-    run_rfq_drafting_agent
+from orchestration.approval import rfq_approval_node
+
+from orchestration.routing import (
+    route_after_intake,
+    route_after_supplier_discovery,
+    route_after_rfq_drafting
 )
 
-from pydantic_models.requirement import Requirement
-from pydantic_models.supplier_candidate import SupplierCandidate
 
+def build_procurement_graph():
 
-def intake_node(state: dict) -> dict:
+    graph = StateGraph(ProcurementState)
 
-    result = run_intake_agent(
-        user_input=state["user_input"],
-        existing_requirement=state.get("requirement_draft")
+    graph.add_node("intake", intake_node)
+    graph.add_node("supplier_discovery", supplier_discovery_node)
+    graph.add_node("rfq_drafting", rfq_drafting_node)
+    graph.add_node("approval", rfq_approval_node)
+
+    graph.add_edge(START, "intake")
+
+    graph.add_conditional_edges(
+        "intake",
+        route_after_intake,
+        {
+            "supplier_discovery": "supplier_discovery",
+            "end": END
+        }
     )
 
-    return {
-        "requirement_draft": result["requirement_draft"],
-        "requirement": result["requirement"],
-        "missing_fields": result["missing_fields"],
-        "clarification_questions": result["clarification_questions"],
-        "intake_errors": result["errors"],
-        "intake_status": result["status"],
-        "current_agent": "intake"
-    }
-
-
-def supplier_discovery_node(state: dict) -> dict:
-
-    result = run_supplier_discovery_agent(
-        requirement=state["requirement"]
+    graph.add_conditional_edges(
+        "supplier_discovery",
+        route_after_supplier_discovery,
+        {
+            "rfq_drafting": "rfq_drafting",
+            "end": END
+        }
     )
 
-    result_data = result.model_dump(mode="json")
-
-    return {
-        "supplier_discovery_result": result_data,
-        "supplier_candidates": result_data["suppliers"],
-        "discovery_status": result_data["status"],
-        "current_agent": "supplier_discovery"
-    }
-
-
-
-def rfq_drafting_node(state: dict) -> dict:
-
-    requirement = Requirement.model_validate(
-        state["requirement"]
+    graph.add_conditional_edges(
+        "rfq_drafting",
+        route_after_rfq_drafting,
+        {
+            "approval": "approval",
+            "end": END
+        }
     )
 
-    # Extract supplier objects from discovery assessments
-    suppliers = [
-        SupplierCandidate.model_validate(
-            assessment["supplier"]
-        )
-        for assessment in state.get("supplier_candidates", [])
-    ]
+    graph.add_edge("approval", END)
 
-    result = run_rfq_drafting_agent(
-        requirement=requirement,
-        suppliers=suppliers
-    )
+    checkpointer = InMemorySaver()
 
-    result_data = result.model_dump(mode="json")
+    return graph.compile(checkpointer=checkpointer)
 
-    return {
-        "rfq_drafting_result": result_data,
-        "rfq_drafts": result_data["rfq_drafts"],
-        "rfq_drafting_status": result_data["status"],
-        "current_agent": "rfq_drafting",
-        "workflow_status": (
-            "pending_approval"
-            if result_data["successful_drafts"] > 0
-            else "rfq_drafting_failed"
-        )
-    }
+
+procurement_graph = build_procurement_graph()

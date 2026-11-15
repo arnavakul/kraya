@@ -16,3 +16,12 @@ def route_after_supplier_discovery(state: dict) -> str:
         return "rfq_drafting"
 
     return "end"
+
+def route_after_rfq_drafting(state: dict) -> str:
+    if (
+        state.get("rfq_drafting_status") in ("completed", "partial")
+        and state.get("rfq_drafts")
+    ):
+        return "approval"
+
+    return "end"

@@ -29,3 +29,13 @@ class ProcurementState(TypedDict, total=False):
     current_agent: str
     workflow_status: str
     errors: list[str]
+
+    supplier_eligibility_results: list[dict]
+    suppliers_requiring_review: list[dict]
+    rfq_drafting_status: str
+    
+    # Human approval
+    approval_decisions: Optional[dict]
+    approval_status: str
+    approved_count: int
+    rejected_count: int
