@@ -1,0 +1,52 @@
+flowchart LR
+    subgraph PROCUREMENT["Procurement LangGraph"]
+        PSTART([START]) --> intake["intake"] --> discovery["supplier_discovery"] --> rfq["rfq_drafting"] --> policy["policy_guardrails / Agent 11"]
+        policy -- block --> PBLOCK([END: blocked])
+        policy -- allow or escalate --> approvals["approval_requests / Agent 12"]
+        approvals -- pending records --> approve["approval: human interrupt"]
+        approve -- approve --> PAPPROVED["approved RFQ context: requirement, org_id, supplier_id, RFQ ID, reviewer"]
+        approve -- reject --> PREJECTED([END: rejected; no handoff])
+    end
+
+    subgraph POST_GRAPH["Existing post-graph dispatch + Stage 6.1 adapter"]
+        dispatch{"DispatchService requires RFQ status approved"}
+        mock_or_provider["Configured email provider; synthetic tests use MockEmailProvider"]
+        sent["Successful dispatch result carries provider_message_id"]
+        handoff["build_approved_rfq_inbox_context + build_inbox_triage_input"]
+        dispatch -- approved --> mock_or_provider --> sent --> handoff
+        dispatch -- pending/rejected --> DENY["No dispatch / no handoff"]
+    end
+    PAPPROVED -. approved result passed by caller .-> dispatch
+
+    subgraph EMAIL["Supplier response carries existing email headers"]
+        reply["EmailMessage: sender_email, email_id, thread_id, in_reply_to"]
+        match{"in_reply_to == provider_message_id AND sender == approved supplier?"}
+        reply --> match
+        match -- No --> unrelated["Triage continues; no RFQ association or evaluation"]
+        match -- Yes --> scoped["Attach approved RFQ requirement and identifiers"]
+    end
+    handoff -. reply-scoped context .-> match
+
+    subgraph INBOX["Inbox LangGraph"]
+        ISTART([START]) --> triage["inbox_triage: security, Agent 11 message check, classification, routing"]
+        triage --> eval["evaluation: Agent 8 deterministic checks; optional existing ML + SHAP"]
+        eval --> neg["negotiation: Agent 11 policy, Agent 9 proposal, Agent 12 pending review"]
+        neg --> IEND([END: reviewable result; no auto-send])
+    end
+    scoped --> triage
+
+    subgraph BACKEND["Current Java backend and Python ML API"]
+        java["Java procurement CRUD API"]
+        mlapi["Python FastAPI XGBoost + TreeSHAP service"]
+    end
+    java -. "MISSING: no production caller invokes either LangGraph or the handoff adapter" .-> intake
+    eval -. existing MLEvaluationClient request when verified inputs exist .-> mlapi
+
+    classDef graphNode fill:#e8f1ff,stroke:#3568a8,color:#13233a;
+    classDef external fill:#e8f7ed,stroke:#398454,color:#15321f;
+    classDef handoff fill:#fff2cc,stroke:#bd8b00,color:#332600;
+    classDef missing fill:#fde8e7,stroke:#b94a48,color:#3a1817,stroke-dasharray: 6 4;
+    class intake,discovery,rfq,policy,approvals,approve,triage,eval,neg graphNode;
+    class dispatch,mock_or_provider,sent,reply,match,scoped,java,mlapi external;
+    class PAPPROVED,handoff handoff;
+    class DENY,PBLOCK,PREJECTED,unrelated,IEND missing;

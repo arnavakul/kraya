@@ -7,6 +7,11 @@ name = "kraya-agents"
 version = "0.1.0"
 description = "Kraya Agentic Procurement AI System"
 requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.162.5",
+    "joblib>=1.6.0",
+    "uvicorn[standard]>=0.54.0",
+]
 
 [tool.setuptools]
 packages = ["models", "tools"]

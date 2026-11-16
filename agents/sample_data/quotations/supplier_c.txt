@@ -1,0 +1,51 @@
+
+SUPPLIER QUOTATION
+
+Quotation ID: CS-2026-045
+Issue Date: 01 November 2026
+
+Supplier: CloudServe Technologies
+Email: procurement@cloudserve.example
+Location: Hyderabad, Telangana
+
+ITEMIZED QUOTATION:
+
+1. Enterprise Server
+   Quantity: 10
+   Unit Price: Rs. 78,000
+   Total: Rs. 7,80,000
+
+2. Rack Mounting Kit
+   Quantity: 2
+   Unit Price: Rs. 15,000
+   Total: Rs. 30,000
+
+FINANCIAL SUMMARY:
+
+Subtotal: Rs. 8,10,000
+GST Rate: 18%
+GST Amount: Rs. 1,45,800
+Discount: Rs. 10,000
+Shipping: Included
+Grand Total: Rs. 9,45,800
+
+DELIVERY:
+
+Delivery Period: 12 Days
+Warranty: 3 Years
+
+PAYMENT TERMS:
+
+40% Advance
+60% After Delivery
+
+Quotation Validity: 21 Days
+
+Notes:
+- Shipping is included in the quoted price.
+- Installation support is included.
+- Technical specifications will be
+  provided before order confirmation.
+
+Authorized Signatory:
+CloudServe Technologies

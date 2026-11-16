@@ -1,0 +1,30 @@
+
+REQUEST FOR QUOTATION
+RFQ ID: RFQ-2026-001
+Issue Date: 01 November 2026
+
+BUYER: Kraya Technologies Pvt. Ltd.
+
+PRODUCT REQUIREMENTS:
+
+Product: Enterprise Server
+Quantity: 10 Units
+Minimum Warranty: 2 Years
+Maximum Delivery Time: 20 Days
+
+TECHNICAL REQUIREMENTS:
+- Minimum 64 GB RAM
+- Minimum 2 TB SSD Storage
+- Enterprise-grade processor
+- Rack mountable
+- Manufacturer warranty required
+
+COMMERCIAL REQUIREMENTS:
+- Currency: INR
+- GST must be mentioned separately.
+- Shipping charges must be disclosed.
+- Payment terms must be specified.
+- Quotation must remain valid for at least 15 days.
+
+Please provide your best quotation with complete
+technical and commercial details.

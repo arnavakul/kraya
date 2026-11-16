@@ -1,4 +1,5 @@
 import joblib
+from pathlib import Path
 import numpy as np
 import pandas as pd
 import shap
@@ -25,10 +26,16 @@ FEATURE_LABELS = {
 }
 
 class ShapEvaluationEngine:
-    def __init__(self, model_path: str = "agents/models/evaluation_xgb_v1.bin"):
-        
+    def __init__(self, model_path: str | None = None):
+
+        if model_path is None:
+            model_path = (
+                Path(__file__).resolve().parents[1]
+                / "models"
+                / "evaluation_xgb_v1.bin"
+            )
+
         self.model = joblib.load(model_path)
-        
         self.explainer = shap.TreeExplainer(self.model)
 
     def _prepare_dataframe(self, feature_vector: FeatureVector) -> pd.DataFrame:

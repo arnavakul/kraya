@@ -25,3 +25,20 @@ def route_after_rfq_drafting(state: dict) -> str:
         return "approval"
 
     return "end"
+
+
+def route_after_policy_guardrails(state: dict) -> str:
+    if state.get("policy_decision") == "block":
+        return "end"
+    if state.get("policy_decision") in ("allow", "escalate"):
+        return "approval_requests"
+    return "end"
+
+
+def route_after_approval_requests(state: dict) -> str:
+    if (
+        state.get("approval_request_status") == "pending"
+        and state.get("approval_records")
+    ):
+        return "approval"
+    return "end"

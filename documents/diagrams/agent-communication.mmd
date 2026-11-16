@@ -1,0 +1,64 @@
+flowchart LR
+    subgraph EXISTING["Existing Kraya components"]
+        intake["Intake Agent"] --> requirement["Validated Requirement"]
+        requirement --> discovery["Supplier Discovery Agent"]
+        discovery --> candidates["Supplier candidates + match evidence"]
+        candidates --> rfq["RFQ Drafting Agent"]
+        rfq --> rfq_drafts["Supplier-specific RFQ drafts"]
+        triage["Inbox Triage Agent"]
+        security["Existing security screening + classifier + deterministic router"]
+        triage --> security
+        dispatch["Existing DispatchService"]
+    end
+
+    subgraph INTEGRATED["Integrated agents"]
+        agent11["Agent 11: Policy Guardrails"]
+        agent12["Agent 12: Approval & Audit"]
+        agent6["Agent 6: Quote Extraction + financial validation"]
+        agent7["Agent 7: Supplier intent + clarification analysis"]
+        agent8["Agent 8: deterministic supplier evaluation"]
+        agent9["Agent 9: bounded negotiation proposal"]
+    end
+
+    subgraph SERVICES["Existing ML service"]
+        mlclient["MLEvaluationClient: only with all verified features and IDs"]
+        xgb["FastAPI XGBoost prediction"]
+        shap["TreeSHAP explanation"]
+        mlclient --> xgb --> shap
+    end
+
+    rfq_drafts --> agent11
+    agent11 -- block --> stopped["Stop RFQ action"]
+    agent11 -- allow/escalate --> agent12
+    agent12 --> pause[["Existing RFQ human approval interrupt"]]
+    pause -- approve --> dispatch
+    pause -- reject --> rejected["Rejected RFQ; no dispatch"]
+    dispatch -. reply-scoped handoff uses actual provider_message_id .-> triage
+
+    security -- quotation_processing --> agent6
+    security -- clarification_workflow --> agent7
+    agent6 -- completed quotation + email identifiers --> agent8
+    requirement -. actual specifications and constraints via approved RFQ handoff .-> agent8
+    agent8 -- eligible only; deterministic constraints PASS --> agent11
+    agent8 -. optional inference .-> mlclient
+    agent11 -- block --> neg_blocked["Negotiation stopped"]
+    agent11 -- escalate/unknown --> neg_review["Human policy review; Agent 12 pending request where identity exists"]
+    agent11 -- allow --> agent9
+    agent9 --> bounded{"Existing OfferCalculator and explicit buyer limits"}
+    bounded -- requires approval --> agent12
+    bounded -- missing limits/violations --> neg_review
+    agent12 --> pending["Pending approval + audit; no automatic approval or counteroffer send"]
+    agent7 --> intent_result["Intent/questions/recommended action; human review when unclear"]
+
+    java["Java backend: procurement CRUD API"] -. "MISSING production integration: no caller to Python LangGraph workflows found" .-> intake
+
+    classDef existing fill:#e8f1ff,stroke:#3568a8,color:#13233a;
+    classDef agent fill:#e8f7ed,stroke:#398454,color:#15321f;
+    classDef human fill:#f5e8ff,stroke:#8253a6,color:#291b35;
+    classDef decision fill:#fff2cc,stroke:#bd8b00,color:#332600;
+    classDef missing fill:#fde8e7,stroke:#b94a48,color:#3a1817,stroke-dasharray: 6 4;
+    class intake,requirement,discovery,candidates,rfq,rfq_drafts,triage,security,dispatch,mlclient,xgb,shap existing;
+    class agent6,agent7,agent8,agent9,agent11,agent12 agent;
+    class pause,pending,intent_result,neg_review human;
+    class bounded decision;
+    class stopped,rejected,neg_blocked,java missing;

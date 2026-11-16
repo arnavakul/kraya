@@ -1,0 +1,83 @@
+flowchart TD
+    START([START]) --> triage["inbox_triage — existing Inbox Triage node"]
+
+    subgraph TRIAGE_DETAIL["Inside inbox_triage node: existing inbox agent"]
+        fetch[Fetch emails] --> claim{"claim_email succeeds?"}
+        claim -- No / duplicate --> skip[Skip duplicate]
+        claim -- Exception --> claim_failed[Record claim failure]
+        claim -- Yes --> security[Existing email security screening]
+        security --> injection["Agent 11 check_untrusted_message"]
+        injection --> safe{"security and policy check pass?"}
+        safe -- No --> security_route["security_review; require human review"]
+        safe -- Yes --> classify[Existing email classification]
+        classify --> confidence{"confidence >= 0.75 and not suspicious?"}
+        classify -. Exception .-> triage_failed[Record processing failure]
+        confidence -- No --> manual[manual_review / security_review]
+        confidence -- Yes --> route{"Existing deterministic email route"}
+        route -- quotation_processing --> agent6["Agent 6: extract quotation + financial validation"]
+        agent6 --> quote_state{"extraction/validation complete?"}
+        quote_state -- Yes --> quote_result[Completed quotation result]
+        quote_state -- No --> quote_review[Needs review / failure]
+        route -- clarification_workflow --> agent7["Agent 7: classify intent, missing information, questions"]
+        agent7 --> intent_result[Intent result; unclear/failure requires human review]
+        route -- other categories --> existing_route["Existing rejection, follow-up, await, quarantine or review route"]
+        skip --> persist["Existing repository completion/failure handling"]
+        claim_failed --> persist
+        triage_failed --> persist
+        security_route --> persist
+        manual --> persist
+        quote_result --> persist
+        quote_review --> persist
+        intent_result --> persist
+        existing_route --> persist
+    end
+
+    triage --> fetch
+    persist --> evaluation["evaluation — Agent 8 via EvaluationAgent"]
+    evaluation --> eval_gate{"completed validated quotations?"}
+    eval_gate -- No --> negotiation_skip["negotiation node skips without evaluation"]
+    eval_gate -- Yes --> context_gate{"approved RFQ context supplied?"}
+    context_gate -- Yes --> correlate{"in_reply_to matches dispatched provider_message_id AND sender matches supplier?"}
+    correlate -- No --> no_match["skip evaluation for this RFQ; do not associate unmatched quote"]
+    correlate -- Yes --> requirements["Use actual RFQ specifications and mandatory_constraints"]
+    context_gate -- No --> standalone["Standalone inbox path; no RFQ requirements supplied"]
+    requirements --> deterministic["Agent 8 deterministic constraint checks + weighted score"]
+    standalone --> deterministic
+    deterministic --> eligible{"all mandatory checks PASS?"}
+    eligible -- No: FAIL or UNKNOWN --> no_neg["Supplier ineligible / pending verification; Agent 9 not entered"]
+    eligible -- Yes --> ml{"all 10 verified features and actual supplier_id + quote_id available?"}
+    ml -- Yes --> xgb["Existing FastAPI XGBoost evaluation endpoint"]
+    xgb --> shap["Existing TreeSHAP explanation returned"]
+    shap --> ml_note["ML adds score/explanation only; deterministic eligibility remains authoritative"]
+    ml -- No --> ml_skip["Skip ML; record missing features"]
+    ml_note --> negotiation
+    ml_skip --> negotiation
+    negotiation["Inside negotiation node: Agent 11 policy check before Agent 9"] --> policy_gate{"policy decision?"}
+    policy_gate -- block --> blocked["policy_blocked; stop"]
+    policy_gate -- escalate/unknown --> exception["Agent 12 creates pending policy-exception review when identity exists"]
+    policy_gate -- allow --> limits{"all explicit commercial limits and quote context present?"}
+    limits -- No --> insufficient["insufficient_information; human review"]
+    limits -- Yes --> agent9["Agent 9 deterministic offer calculator + approval checker"]
+    agent9 --> approval_gate{"human approval required?"}
+    approval_gate -- Yes --> pending["Agent 12 creates pending sensitive-action approval"]
+    approval_gate -- No --> proposal["Proposal returned for human review"]
+    pending --> final["Final reviewable recommendation; no counteroffer send"]
+    proposal --> final
+    exception --> final
+    insufficient --> final
+    blocked --> final
+    no_neg --> final
+    no_match --> final
+    negotiation_skip --> final
+    final --> END([END])
+
+    classDef graphNode fill:#e8f1ff,stroke:#3568a8,color:#13233a;
+    classDef decision fill:#fff2cc,stroke:#bd8b00,color:#332600;
+    classDef agent fill:#e8f7ed,stroke:#398454,color:#15321f;
+    classDef review fill:#f5e8ff,stroke:#8253a6,color:#291b35;
+    classDef stop fill:#fde8e7,stroke:#b94a48,color:#3a1817;
+    class triage,evaluation,negotiation graphNode;
+    class claim,safe,confidence,route,quote_state,eval_gate,context_gate,correlate,eligible,ml,policy_gate,limits,approval_gate decision;
+    class security,injection,classify,agent6,agent7,deterministic,xgb,shap,agent9 agent;
+    class quote_review,intent_result,manual,exception,insufficient,pending,final review;
+    class skip,claim_failed,triage_failed,security_route,existing_route,negotiation_skip,no_match,no_neg,blocked stop;

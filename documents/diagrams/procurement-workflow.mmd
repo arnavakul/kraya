@@ -1,0 +1,49 @@
+flowchart TD
+    START([START]) --> intake["intake — Intake Agent"]
+    intake --> intake_gate{"intake_status == validated?"}
+    intake_gate -- No --> end_intake([END])
+    intake_gate -- Yes --> discovery["supplier_discovery — Supplier Discovery Agent"]
+    discovery --> discovery_gate{"completed and candidates present?"}
+    discovery_gate -- No --> end_discovery([END])
+    discovery_gate -- Yes --> rfq["rfq_drafting — RFQ Drafting Agent + deterministic supplier eligibility"]
+    rfq --> rfq_gate{"completed/partial and RFQ drafts present?"}
+    rfq_gate -- No --> end_rfq([END])
+    rfq_gate -- Yes --> policy["policy_guardrails — Agent 11"]
+    policy --> policy_gate{"policy_decision?"}
+    policy_gate -- block --> end_blocked([END: policy_blocked])
+    policy_gate -- allow --> requests["approval_requests — Agent 12 creates request per RFQ"]
+    policy_gate -- escalate --> requests
+    policy_gate -- other/unknown --> end_policy([END])
+    requests --> request_gate{"all required requests pending?"}
+    request_gate -- No --> end_request([END: no approval continuation])
+    request_gate -- Yes --> approval["approval — RFQ approval node"]
+
+    subgraph HUMAN["Inside approval node: existing human interrupt"]
+        interrupt[[LangGraph interrupt: review every RFQ]] --> human_decision["Human supplies approve/reject and reviewer_user_id"]
+        human_decision --> record_decision["Agent 12 validates reviewer authorization and records/audits decision"]
+        record_decision --> decision_result{"Decision status"}
+        decision_result -- approved --> approved["set RFQ status approved; emit approved_rfq_contexts"]
+        decision_result -- rejected --> rejected["set RFQ status rejected; no approved context"]
+    end
+    approval -. suspends at .-> interrupt
+    approved --> end_approved([END: approved])
+    rejected --> end_rejected([END: rejected])
+
+    subgraph OUTSIDE["After procurement graph: existing service, not a graph node"]
+        dispatch{"DispatchService: RFQ status approved?"}
+        dispatch -- No --> no_send["Reject dispatch; no provider send"]
+        dispatch -- Yes --> send["Dispatch through configured provider"]
+    end
+    end_approved -. caller may pass approved RFQ .-> dispatch
+    send --> result["dispatch result: status + provider_message_id"]
+
+    classDef graphNode fill:#e8f1ff,stroke:#3568a8,color:#13233a;
+    classDef decision fill:#fff2cc,stroke:#bd8b00,color:#332600;
+    classDef human fill:#f5e8ff,stroke:#8253a6,color:#291b35;
+    classDef external fill:#e8f7ed,stroke:#398454,color:#15321f;
+    classDef stop fill:#fde8e7,stroke:#b94a48,color:#3a1817;
+    class intake,discovery,rfq,policy,requests,approval graphNode;
+    class intake_gate,discovery_gate,rfq_gate,policy_gate,request_gate,decision_result,dispatch decision;
+    class interrupt,human_decision,record_decision,approved,rejected human;
+    class send,result external;
+    class end_intake,end_discovery,end_rfq,end_blocked,end_policy,end_request,end_approved,end_rejected,no_send stop;
