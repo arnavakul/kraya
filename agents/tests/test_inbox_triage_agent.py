@@ -3,6 +3,16 @@ from pydantic_models.email_classification import EmailClassification
 
 from agents.inbox_triage.agent import run_inbox_triage_agent
 from tools.inbox.mock_email_connector import MockEmailConnector
+from schemas.quotation import Quotation
+from schemas.suppliers_intent import (
+    RecommendedAction,
+    SupplierIntent,
+    SupplierIntentAnalysis,
+)
+from services.financial_validator import (
+    ValidationReport,
+    ValidationStatus,
+)
 
 
 class FakeInboxRepository:
@@ -33,6 +43,37 @@ class FakeInboxRepository:
 
         self.failed[email_id] = error_message
         return True
+
+
+class FakeQuoteExtractionAgent:
+
+    def process_text(self, document_text):
+        return {
+            "quotation": Quotation(
+                supplier_name="Synthetic Supplier",
+                currency="INR",
+            ),
+            "validation_report": ValidationReport(
+                status=ValidationStatus.VALID,
+            ),
+        }
+
+
+class FakeSupplierIntentAgent:
+
+    def process_message(self, **kwargs):
+        return SupplierIntentAnalysis(
+            intent=SupplierIntent.INTERESTED,
+            intent_summary="Supplier is interested.",
+            recommended_action=RecommendedAction.NO_ACTION,
+        )
+
+
+def fake_agents():
+    return {
+        "quote_extraction_agent": FakeQuoteExtractionAgent(),
+        "supplier_intent_agent": FakeSupplierIntentAgent(),
+    }
 
 
 def mock_classify_email(email, security_result):
@@ -72,7 +113,8 @@ def test_agent_processes_all_emails(monkeypatch):
     repository = FakeInboxRepository()
 
     result = run_inbox_triage_agent(
-        repository=repository
+        repository=repository,
+        **fake_agents(),
     )
 
     assert result.total_fetched == 7
@@ -89,7 +131,8 @@ def test_agent_routes_all_categories(monkeypatch):
     )
 
     result = run_inbox_triage_agent(
-        repository=FakeInboxRepository()
+        repository=FakeInboxRepository(),
+        **fake_agents(),
     )
 
     categories = [
@@ -115,7 +158,8 @@ def test_suspicious_email_goes_to_security_review(monkeypatch):
     )
 
     result = run_inbox_triage_agent(
-        repository=FakeInboxRepository()
+        repository=FakeInboxRepository(),
+        **fake_agents(),
     )
 
     suspicious = next(
@@ -140,7 +184,8 @@ def test_duplicate_emails_are_skipped(monkeypatch):
     )
 
     result = run_inbox_triage_agent(
-        repository=repository
+        repository=repository,
+        **fake_agents(),
     )
 
     assert result.total_skipped == 2
@@ -159,7 +204,8 @@ def test_processed_results_are_persisted(monkeypatch):
     repository = FakeInboxRepository()
 
     result = run_inbox_triage_agent(
-        repository=repository
+        repository=repository,
+        **fake_agents(),
     )
 
     assert len(repository.completed) == 7

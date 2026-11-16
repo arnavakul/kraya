@@ -12,7 +12,13 @@ from orchestration.approval import rfq_approval_node
 def build_test_graph():
     graph = StateGraph(ProcurementState)
 
-    graph.add_node("approval", rfq_approval_node)
+    graph.add_node(
+        "approval",
+        lambda state: rfq_approval_node(
+            state,
+            approval_agent=FakeApprovalAgent(),
+        ),
+    )
 
     graph.add_edge(START, "approval")
     graph.add_edge("approval", END)
@@ -39,6 +45,31 @@ def get_test_drafts():
     ]
 
 
+def get_test_records():
+    return [
+        {
+            "id": f"approval-{index:03d}",
+            "organization_id": "org-test",
+            "requester_user_id": "requester-test",
+            "action": "supplier_selection",
+            "entity_type": "rfq",
+            "entity_id": f"rfq-{index:03d}",
+            "reason": "Synthetic approval test.",
+            "evidence": [],
+            "status": "pending",
+        }
+        for index in (1, 2)
+    ]
+
+
+class FakeApprovalAgent:
+    def process_decision(self, decision, organization_id):
+        assert organization_id == "org-test"
+        if decision.reviewer_user_id == "requester-test":
+            raise ValueError("Requester cannot approve their own request.")
+        return type("Processed", (), {"status": decision.status})()
+
+
 def get_config():
     return {
         "configurable": {
@@ -51,7 +82,10 @@ def test_approval_workflow_pauses_for_human_input():
     graph = build_test_graph()
 
     result = graph.invoke(
-        {"rfq_drafts": get_test_drafts()},
+        {
+            "rfq_drafts": get_test_drafts(),
+            "approval_records": get_test_records(),
+        },
         config=get_config()
     )
 
@@ -66,7 +100,10 @@ def test_all_rfqs_can_be_approved():
     config = get_config()
 
     graph.invoke(
-        {"rfq_drafts": get_test_drafts()},
+        {
+            "rfq_drafts": get_test_drafts(),
+            "approval_records": get_test_records(),
+        },
         config=config
     )
 
@@ -74,8 +111,8 @@ def test_all_rfqs_can_be_approved():
         Command(
             resume={
                 "decisions": [
-                    {"rfq_id": "rfq-001", "decision": "approve"},
-                    {"rfq_id": "rfq-002", "decision": "approve"}
+                    {"rfq_id": "rfq-001", "decision": "approve", "reviewer_user_id": "reviewer-test"},
+                    {"rfq_id": "rfq-002", "decision": "approve", "reviewer_user_id": "reviewer-test"}
                 ]
             }
         ),
@@ -98,7 +135,10 @@ def test_all_rfqs_can_be_rejected():
     config = get_config()
 
     graph.invoke(
-        {"rfq_drafts": get_test_drafts()},
+        {
+            "rfq_drafts": get_test_drafts(),
+            "approval_records": get_test_records(),
+        },
         config=config
     )
 
@@ -106,8 +146,8 @@ def test_all_rfqs_can_be_rejected():
         Command(
             resume={
                 "decisions": [
-                    {"rfq_id": "rfq-001", "decision": "reject"},
-                    {"rfq_id": "rfq-002", "decision": "reject"}
+                    {"rfq_id": "rfq-001", "decision": "reject", "reviewer_user_id": "reviewer-test"},
+                    {"rfq_id": "rfq-002", "decision": "reject", "reviewer_user_id": "reviewer-test"}
                 ]
             }
         ),
@@ -125,7 +165,10 @@ def test_mixed_approval_decisions():
     config = get_config()
 
     graph.invoke(
-        {"rfq_drafts": get_test_drafts()},
+        {
+            "rfq_drafts": get_test_drafts(),
+            "approval_records": get_test_records(),
+        },
         config=config
     )
 
@@ -133,8 +176,8 @@ def test_mixed_approval_decisions():
         Command(
             resume={
                 "decisions": [
-                    {"rfq_id": "rfq-001", "decision": "approve"},
-                    {"rfq_id": "rfq-002", "decision": "reject"}
+                    {"rfq_id": "rfq-001", "decision": "approve", "reviewer_user_id": "reviewer-test"},
+                    {"rfq_id": "rfq-002", "decision": "reject", "reviewer_user_id": "reviewer-test"}
                 ]
             }
         ),
@@ -154,7 +197,10 @@ def test_invalid_decision_is_rejected():
     config = get_config()
 
     graph.invoke(
-        {"rfq_drafts": get_test_drafts()},
+        {
+            "rfq_drafts": get_test_drafts(),
+            "approval_records": get_test_records(),
+        },
         config=config
     )
 
@@ -163,8 +209,8 @@ def test_invalid_decision_is_rejected():
             Command(
                 resume={
                     "decisions": [
-                        {"rfq_id": "rfq-001", "decision": "send"},
-                        {"rfq_id": "rfq-002", "decision": "approve"}
+                        {"rfq_id": "rfq-001", "decision": "send", "reviewer_user_id": "reviewer-test"},
+                        {"rfq_id": "rfq-002", "decision": "approve", "reviewer_user_id": "reviewer-test"}
                     ]
                 }
             ),
@@ -177,7 +223,10 @@ def test_missing_decision_is_rejected():
     config = get_config()
 
     graph.invoke(
-        {"rfq_drafts": get_test_drafts()},
+        {
+            "rfq_drafts": get_test_drafts(),
+            "approval_records": get_test_records(),
+        },
         config=config
     )
 
@@ -186,7 +235,7 @@ def test_missing_decision_is_rejected():
             Command(
                 resume={
                     "decisions": [
-                        {"rfq_id": "rfq-001", "decision": "approve"}
+                        {"rfq_id": "rfq-001", "decision": "approve", "reviewer_user_id": "reviewer-test"}
                     ]
                 }
             ),

@@ -1,7 +1,8 @@
 
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
+from schemas.suppliers_intent import SupplierIntentAnalysis
 
 
 EmailCategory = Literal[
@@ -62,6 +63,31 @@ class InboxProcessingFailure(BaseModel):
     error: str
 
 
+class QuotationProcessingResult(BaseModel):
+    email_id: str
+    thread_id: str | None = None
+    in_reply_to: str | None = None
+    sender_email: str
+    sender_name: str | None = None
+    status: Literal["completed", "needs_review", "failed"]
+    quotation: dict[str, Any] | None = None
+    financial_validation: dict[str, Any] | None = None
+    error: str | None = None
+    requires_human_review: bool = False
+
+
+class SupplierIntentProcessingResult(BaseModel):
+    email_id: str
+    thread_id: str | None = None
+    in_reply_to: str | None = None
+    sender_email: str
+    sender_name: str | None = None
+    status: Literal["completed", "failed"]
+    analysis: SupplierIntentAnalysis | None = None
+    error: str | None = None
+    requires_human_review: bool = False
+
+
 class InboxTriageRunResult(BaseModel):
     processed_emails: list[InboxTriageResult] = Field(
         default_factory=list
@@ -72,6 +98,14 @@ class InboxTriageRunResult(BaseModel):
     )
 
     failed_emails: list[InboxProcessingFailure] = Field(
+        default_factory=list
+    )
+
+    quotation_processing_results: list[QuotationProcessingResult] = Field(
+        default_factory=list
+    )
+
+    supplier_intent_results: list[SupplierIntentProcessingResult] = Field(
         default_factory=list
     )
 

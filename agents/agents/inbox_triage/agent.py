@@ -5,6 +5,10 @@ from tools.inbox.security_screening import screen_email_security
 from tools.inbox.email_classifier import classify_email
 from tools.inbox.email_router import route_email
 from tools.inbox.inbox_repository import InboxRepository
+from agents.inbox_triage.handoffs import (
+    process_clarification_message,
+    process_quotation_message,
+)
 
 from pydantic_models.inbox_triage_result import (
     InboxTriageResult,
@@ -16,6 +20,9 @@ from pydantic_models.inbox_triage_result import (
 def run_inbox_triage_agent(
     connector: EmailConnector | None = None,
     repository: InboxRepository | None = None,
+    quote_extraction_agent=None,
+    supplier_intent_agent=None,
+    policy_guardrails_agent=None,
 ) -> InboxTriageRunResult:
     """
     Fetch, claim, classify, route and persist incoming emails.
@@ -29,6 +36,11 @@ def run_inbox_triage_agent(
 
     if repository is None:
         repository = InboxRepository()
+
+    if policy_guardrails_agent is None:
+        from agents.policy_guardrails.agent import PolicyGuardrailsAgent
+
+        policy_guardrails_agent = PolicyGuardrailsAgent()
 
     emails = connector.fetch_emails()
 
@@ -63,6 +75,26 @@ def run_inbox_triage_agent(
             # Stage 2: Security screening.
             security_result = screen_email_security(email)
 
+            # Preserve the existing screening and add Agent 11's check
+            # before classification or any LLM handoff.
+            policy_check = policy_guardrails_agent.check_untrusted_message(
+                f"{email.subject}\n{email.body}"
+            )
+            if policy_check.status.value != "pass":
+                flags = list(security_result.security_flags)
+                if policy_check.check_name not in flags:
+                    flags.append(policy_check.check_name)
+                security_result = security_result.model_copy(update={
+                    "is_suspicious": True,
+                    "requires_human_review": True,
+                    "risk_level": (
+                        "high" if policy_check.status.value == "fail"
+                        else "medium"
+                    ),
+                    "security_flags": flags,
+                    "screening_summary": policy_check.reason,
+                })
+
             # Stage 3: Classification.
             current_stage = "classification"
 
@@ -79,6 +111,30 @@ def run_inbox_triage_agent(
                 classification=classification,
                 security_result=security_result,
             )
+
+            if triage_result.routing_action == "quotation_processing":
+                processing_result = process_quotation_message(
+                    email=email,
+                    quote_agent=quote_extraction_agent,
+                )
+                run_result.quotation_processing_results.append(
+                    processing_result
+                )
+                if processing_result.requires_human_review:
+                    triage_result = triage_result.model_copy(
+                        update={"requires_human_review": True}
+                    )
+
+            elif triage_result.routing_action == "clarification_workflow":
+                intent_result = process_clarification_message(
+                    email=email,
+                    intent_agent=supplier_intent_agent,
+                )
+                run_result.supplier_intent_results.append(intent_result)
+                if intent_result.requires_human_review:
+                    triage_result = triage_result.model_copy(
+                        update={"requires_human_review": True}
+                    )
 
             # Stage 5: Persist the result.
             current_stage = "persistence"

@@ -1,0 +1,40 @@
+
+SUPPLIER QUOTATION
+
+Quotation Number: QUO-ABC-001
+Date: 01 November 2026
+
+SUPPLIER DETAILS:
+Company Name: ABC Technologies Pvt. Ltd.
+Email: sales@abc-tech.example
+Address: Bengaluru, Karnataka
+
+PRODUCT DETAILS:
+
+Product: Enterprise Server
+Description: Rack Mount Enterprise Server
+Quantity: 10 Units
+Unit Price: INR 75,000
+Total Price: INR 7,50,000
+
+FINANCIAL DETAILS:
+
+Subtotal: INR 7,50,000
+GST: 18%
+GST Amount: INR 1,35,000
+Shipping Charges: INR 5,000
+Discount: INR 0
+Grand Total: INR 8,90,000
+
+DELIVERY DETAILS:
+
+Delivery Period: 15 Days
+Warranty: 2 Years
+
+COMMERCIAL TERMS:
+
+Payment Terms: 50% Advance, 50% on Delivery
+Quotation Validity: 30 Days
+
+Authorized Signatory:
+ABC Technologies Pvt. Ltd.

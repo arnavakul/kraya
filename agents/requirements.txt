@@ -43,3 +43,5 @@ openpyxl
 pymupdf
 python-docx
 httpx
+groq>=1.7.0
+supabase>=2.34.1

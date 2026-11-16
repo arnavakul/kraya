@@ -1,6 +1,6 @@
 from datetime import date, datetime
-from pydantic_models.requirement import Requirement
-from pydantic_models.procurementRequest import ProcurementRequest
+from tests.pydantic_models.requirement import Requirement
+from tests.pydantic_models.procurementRequest import ProcurementRequest
 
 requirement = Requirement(
     product_service="Laptop",
