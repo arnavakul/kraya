@@ -5,6 +5,7 @@ import { useAuth } from '../auth/AuthProvider';
 import { canManage } from '../lib/permissions';
 import { useTheme } from '../lib/useTheme';
 import ThemeToggle from './ThemeToggle';
+import FloatingChatbot from './FloatingChatbot';
 
 export default function AppLayout() {
   const { user, logout } = useAuth();
@@ -45,6 +46,8 @@ export default function AppLayout() {
               <li><NavLink to="/dashboard">Dashboard</NavLink></li>
               <li><NavLink to="/requests">Requests</NavLink></li>
               <li><NavLink to="/suppliers">Suppliers</NavLink></li>
+              <li><NavLink to="/agents">Agents</NavLink></li>
+              <li><NavLink to="/analytics">Analytics</NavLink></li>
             </ul>
             <div className="nav-actions">
               {canManage(user) && (
@@ -70,6 +73,8 @@ export default function AppLayout() {
       <main>
         <Outlet />
       </main>
+
+      <FloatingChatbot />
     </>
   );
 }

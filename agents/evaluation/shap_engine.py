@@ -2,6 +2,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import shap
+from pathlib import Path
 from typing import Dict, Any, List
 from pydantic_models.evaluation_schemas import (
     FeatureVector,
@@ -25,9 +26,13 @@ FEATURE_LABELS = {
 }
 
 class ShapEvaluationEngine:
-    def __init__(self, model_path: str = "agents/models/evaluation_xgb_v1.bin"):
-        
-        self.model = joblib.load(model_path)
+    def __init__(self, model_path: str | None = None):
+        resolved_model_path = (
+            Path(model_path)
+            if model_path is not None
+            else Path(__file__).resolve().parents[1] / "models" / "evaluation_xgb_v1.bin"
+        )
+        self.model = joblib.load(resolved_model_path)
         
         self.explainer = shap.TreeExplainer(self.model)
 

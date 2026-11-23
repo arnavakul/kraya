@@ -12,6 +12,9 @@ import Dashboard from './pages/Dashboard';
 import SupplierList from './pages/SupplierList';
 import SupplierForm from './pages/SupplierForm';
 import SupplierDetail from './pages/SupplierDetail';
+import AgentChat from './pages/AgentChat';
+import Analytics from './pages/Analytics';
+import { AgentChatProvider } from './context/AgentChatContext';
 import './styles/requests.css';
 import './styles/suppliers.css';
 
@@ -68,29 +71,34 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<LoginRoute />} />
-            <Route path="/signup" element={<SignupRoute />} />
+          <AgentChatProvider>
+            <Routes>
+              <Route path="/login" element={<LoginRoute />} />
+              <Route path="/signup" element={<SignupRoute />} />
 
-            <Route element={<RequireAuth />}>
-              <Route element={<AppLayout />}>
-                <Route index element={<Navigate to="/dashboard" replace />} />
+              <Route element={<RequireAuth />}>
+                <Route element={<AppLayout />}>
+                  <Route index element={<Navigate to="/dashboard" replace />} />
 
-                <Route path="dashboard" element={<Dashboard />} />
-                <Route path="requests" element={<RequestList />} />
-                <Route path="requests/new" element={<RequestForm />} />
-                <Route path="requests/:id" element={<RequestDetail />} />
-                <Route path="requests/:id/edit" element={<RequestForm />} />
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="requests" element={<RequestList />} />
+                  <Route path="requests/new" element={<RequestForm />} />
+                  <Route path="requests/:id" element={<RequestDetail />} />
+                  <Route path="requests/:id/edit" element={<RequestForm />} />
 
-                <Route path="suppliers" element={<SupplierList />} />
-                <Route path="suppliers/new" element={<SupplierForm />} />
-                <Route path="suppliers/:id" element={<SupplierDetail />} />
-                <Route path="suppliers/:id/edit" element={<SupplierForm />} />
+                  <Route path="suppliers" element={<SupplierList />} />
+                  <Route path="suppliers/new" element={<SupplierForm />} />
+                  <Route path="suppliers/:id" element={<SupplierDetail />} />
+                  <Route path="suppliers/:id/edit" element={<SupplierForm />} />
+
+                  <Route path="agents" element={<AgentChat />} />
+                  <Route path="analytics" element={<Analytics />} />
+                </Route>
               </Route>
-            </Route>
 
-            <Route path="*" element={<Navigate to="/requests" replace />} />
-          </Routes>
+              <Route path="*" element={<Navigate to="/requests" replace />} />
+            </Routes>
+          </AgentChatProvider>
         </AuthProvider>
       </BrowserRouter>
     </QueryClientProvider>

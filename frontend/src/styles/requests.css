@@ -36,6 +36,7 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .rq-badge--active{background:var(--violet-bg);color:var(--violet)}
 .rq-badge--done{background:color-mix(in srgb,var(--lime) 15%,transparent);color:var(--lime)}
 .rq-badge--bad{background:rgba(229,72,77,.15);color:#e5484d}
+.rq-badge--warning{background:rgba(245,183,60,.15);color:var(--amber)}
 
 /* progress stepper */
 .rq-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;list-style:none;margin:0 0 20px;padding:0}
@@ -84,6 +85,795 @@ a.btn{display:inline-flex;align-items:center;justify-content:center;text-decorat
 .rq-dot{width:10px;height:10px;margin-top:7px;border-radius:50%;background:var(--lime)}
 .rq-time{color:var(--muted);font-size:.85rem}
 
+/* ============================================================
+   AI Sourcing Workflow & RFQ Dispatch Styles
+   Fixes alignment, text overflow, and provides approval action
+   ============================================================ */
+
+.rq-workflow-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+
+.rq-workflow-meta-chips {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rq-workflow-run-chip {
+  font-size: 12px;
+  color: var(--muted);
+  background: var(--field);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+.rq-workflow-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+/* Supplier Evaluation Section */
+.rq-suppliers-evaluation-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rq-suppliers-eval-title {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.rq-qualified-suppliers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.rq-decision-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rq-decision--manual_review {
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.35);
+}
+
+.rq-decision--eligible {
+  background: rgba(95, 220, 90, 0.15);
+  color: #5fdc5a;
+  border: 1px solid rgba(95, 220, 90, 0.35);
+}
+
+.rq-decision--excluded {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.rq-status-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(95, 220, 90, 0.12);
+  color: #a6f03c;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.rq-clarifications-box {
+  padding: 14px 16px;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 12px;
+  color: #fbbf24;
+  font-size: 13px;
+}
+
+.rq-clarifications-box ul {
+  margin: 6px 0 0 18px;
+  padding: 0;
+}
+
+.rq-qualified-supplier-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: #0b140b;
+  border: 1px solid #234723;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rq-qualified-supplier-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f2f5f2;
+}
+
+.rq-qualified-supplier-reason {
+  font-size: 13px;
+  color: #9cb09c;
+  margin-top: 3px;
+}
+
+/* Excluded Accordion */
+.rq-excluded-accordion {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--field);
+  overflow: hidden;
+  transition: all 0.15s ease;
+}
+
+.rq-excluded-accordion summary {
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+
+.rq-excluded-accordion summary:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.rq-excluded-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-top: 1px solid var(--line);
+}
+
+.rq-excluded-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+  padding: 4px 0;
+}
+
+.rq-excluded-item strong {
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.rq-excluded-reason {
+  font-size: 11.5px;
+  color: #7a887a;
+  text-align: right;
+}
+
+/* ============================================================
+   RFQ Email Draft & Dispatch Composer Card
+   ============================================================ */
+
+.rq-rfq-card {
+  background: #080f08;
+  border: 1.5px solid #285420;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(95, 220, 90, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.rq-rfq-card--dispatched {
+  border-color: #3b7432;
+}
+
+.rq-rfq-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  background: #0c180c;
+  border-bottom: 1px solid #1a301a;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rq-rfq-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rq-rfq-icon-badge {
+  font-size: 18px;
+  color: #5fdc5a;
+}
+
+.rq-rfq-head-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #f2f5f2;
+}
+
+.rq-rfq-meta-table {
+  padding: 14px 20px;
+  background: #091209;
+  border-bottom: 1px solid #162616;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13.5px;
+}
+
+.rq-rfq-meta-row {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+
+.rq-rfq-meta-label {
+  width: 70px;
+  color: var(--muted);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.rq-rfq-meta-val {
+  color: #f2f5f2;
+  overflow-wrap: anywhere;
+}
+
+.rq-rfq-meta-val strong {
+  color: #a6f03c;
+}
+
+/* Email Body Frame — Fixes Text Overflow & Cutoff */
+.rq-rfq-body-container {
+  padding: 20px;
+  background: #050a05;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.rq-rfq-body-preview {
+  margin: 0;
+  padding: 16px 18px;
+  background: #080d08;
+  border: 1px solid #192819;
+  border-radius: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #d8e5d8;
+  white-space: pre-wrap;       /* Fixes horizontal overflow */
+  word-break: break-word;      /* Fixes text cutoff */
+  overflow-x: hidden;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Action Footer & Dispatch Controls */
+.rq-rfq-actions-footer {
+  padding: 16px 20px;
+  background: #0b160b;
+  border-top: 1px solid #1a301a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.rq-rfq-actions-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rq-rfq-dispatch-help {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.rq-rfq-actions-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.rq-rfq-btn-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rq-gmail-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  font-size: 14.5px;
+  font-weight: 700;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #a6f03c, #5fdc5a);
+  color: #06140a;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 18px rgba(95, 220, 90, 0.35);
+}
+
+.rq-gmail-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(95, 220, 90, 0.5);
+  color: #040e06;
+}
+
+.rq-gmail-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.rq-agent-dispatch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 11px 18px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-radius: 999px;
+  background: #112411;
+  color: #a6f03c;
+  border: 1px solid #2d5a2d;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rq-agent-dispatch-btn:hover:not(:disabled) {
+  background: #183318;
+  border-color: #5fdc5a;
+}
+
+.rq-alt-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+}
+
+.rq-email-link {
+  color: #8fa08f;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.rq-email-link:hover {
+  color: #a6f03c;
+}
+
+.rq-dispatch-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  font-size: 14.5px;
+  font-weight: 700;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #a6f03c, #5fdc5a);
+  color: #06140a;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 18px rgba(95, 220, 90, 0.35);
+}
+
+.rq-dispatch-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(95, 220, 90, 0.5);
+}
+
+.rq-dispatch-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Dispatch Confirmation Banner */
+.rq-dispatch-success-banner {
+  padding: 14px 18px;
+  border-radius: 12px;
+  background: rgba(95, 220, 90, 0.1);
+  border: 1px solid rgba(95, 220, 90, 0.3);
+  color: #a6f03c;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.rq-dispatch-check-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.rq-dispatch-receipt-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #8fa08f;
+}
+
+.rq-tracking-chip {
+  font-family: monospace;
+  background: #0e200e;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid #234823;
+  color: #5fdc5a;
+}
+
+/* ============================================================
+   Supplier Communication Thread & AI Autonomous Negotiation Hub
+   ============================================================ */
+
+.rq-thread-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.rq-thread-container {
+  background: #060b06;
+  border: 1px solid #1a301a;
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rq-thread-head {
+  padding: 14px 20px;
+  background: #0c180c;
+  border-bottom: 1px solid #1a301a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rq-thread-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f2f5f2;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rq-thread-messages {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.rq-thread-msg {
+  background: #0a130a;
+  border: 1px solid #182c18;
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+.rq-thread-msg--buyer {
+  border-left: 4px solid #5fdc5a;
+  background: #091409;
+}
+
+.rq-thread-msg--supplier {
+  border-left: 4px solid #facc15;
+  background: #141208;
+}
+
+.rq-thread-msg--agent {
+  border-left: 4px solid #a855f7;
+  background: #11091a;
+  border-color: #2b1740;
+}
+
+.rq-msg-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rq-msg-sender {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #f2f5f2;
+}
+
+.rq-msg-time {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.rq-strategy-box {
+  background: rgba(168, 85, 247, 0.12);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: #d8b4fe;
+  line-height: 1.5;
+}
+
+.rq-msg-content {
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #d8e5d8;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
+.rq-thread-controls {
+  padding: 16px 20px;
+  background: #091209;
+  border-top: 1px solid #1a301a;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.rq-quick-sim-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.rq-sim-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rq-sim-pill-btn {
+  background: #132413;
+  color: #a6f03c;
+  border: 1px solid #285420;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rq-sim-pill-btn:hover:not(:disabled) {
+  background: #1e381e;
+  border-color: #5fdc5a;
+  transform: translateY(-1px);
+}
+
+.rq-thread-input-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.rq-thread-textarea {
+  flex: 1;
+  min-height: 70px;
+  background: #050a05;
+  border: 1px solid #1f381f;
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #f2f5f2;
+  font-family: inherit;
+  font-size: 13px;
+  resize: vertical;
+}
+
+.rq-thread-textarea:focus {
+  outline: none;
+  border-color: #5fdc5a;
+}
+
+.rq-stage-sync-banner {
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: rgba(95, 220, 90, 0.08);
+  border: 1px solid rgba(95, 220, 90, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: #a6f03c;
+}
+
+/* ============================================================
+   AI Drafted Response & Human Approval Card
+   ============================================================ */
+
+.rq-pending-draft-card {
+  margin: 16px 20px;
+  background: #0d121c;
+  border: 1.5px solid #6366f1;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(99, 102, 241, 0.2);
+  display: flex;
+  flex-direction: column;
+}
+
+.rq-pending-draft-head {
+  padding: 12px 18px;
+  background: #141b2a;
+  border-bottom: 1px solid #232d42;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rq-pending-draft-title {
+  margin: 0;
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #e0e7ff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rq-pending-approval-badge {
+  background: rgba(234, 179, 8, 0.15);
+  color: #facc15;
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.rq-pending-draft-body {
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rq-draft-edit-textarea {
+  width: 100%;
+  min-height: 140px;
+  background: #080d16;
+  border: 1px solid #27354f;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.rq-draft-edit-textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.rq-draft-actions-bar {
+  padding: 14px 18px;
+  background: #101726;
+  border-top: 1px solid #232d42;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 @media (min-width: 721px) {
   .nav-actions a.btn:not(.ghost) { display: none; }
+}
+
+
+/* Live Gmail Integration Card */
+.rq-gmail-integration-card {
+  margin-bottom: 16px;
+  background: #091209;
+  border: 1px solid #1a301a;
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+
+.rq-gmail-bar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.rq-gmail-config-panel {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid #1a301a;
+}
+
+.rq-gmail-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 8px 14px;
+  background: #050a05;
+  border: 1px solid #233b23;
+  border-radius: 8px;
+  color: #f2f5f2;
+  font-size: 13.5px;
+}
+
+.rq-gmail-input:focus {
+  outline: none;
+  border-color: #5fdc5a;
 }

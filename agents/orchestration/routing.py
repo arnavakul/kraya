@@ -9,10 +9,7 @@ def route_after_intake(state: dict) -> str:
 
 def route_after_supplier_discovery(state: dict) -> str:
 
-    if (
-        state.get("discovery_status") == "completed"
-        and state.get("supplier_candidates")
-    ):
+    if state.get("discovery_status") == "completed":
         return "rfq_drafting"
 
     return "end"

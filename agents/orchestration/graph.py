@@ -1,4 +1,12 @@
 
+import sys
+import os
+
+_current_dir = os.path.dirname(os.path.abspath(__file__))
+_parent_dir = os.path.abspath(os.path.join(_current_dir, ".."))
+if _parent_dir not in sys.path:
+    sys.path.insert(0, _parent_dir)
+
 from langgraph.graph import StateGraph, START, END
 
 from orchestration.state import ProcurementState
@@ -49,8 +57,21 @@ def build_procurement_graph():
 
     # Final node
     graph.add_edge("rfq_drafting", END)
-
     return graph.compile()
 
 
 procurement_graph = build_procurement_graph()
+
+
+if __name__ == "__main__":
+    import os
+    docs_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "documents"))
+    os.makedirs(docs_dir, exist_ok=True)
+    out_path = os.path.join(docs_dir, "langgraph_procurement_graph.png")
+    try:
+        img_bytes = procurement_graph.get_graph().draw_mermaid_png()
+        with open(out_path, "wb") as f:
+            f.write(img_bytes)
+        print(f"Graph image generated successfully at: {out_path}")
+    except Exception as e:
+        print(f"Error generating graph image: {e}")

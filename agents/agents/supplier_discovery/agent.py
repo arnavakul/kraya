@@ -1,5 +1,4 @@
 
-from tools.supplier.supplier_search import search_suppliers
 from tools.supplier.supplier_matcher import match_supplier_requirements
 from tools.supplier.supplier_verifier import verify_supplier
 from tools.supplier.supplier_evidence import compile_supplier_evidence
@@ -10,7 +9,8 @@ from pydantic_models.supplier_discovery_result import (
 
 
 def run_supplier_discovery_agent(
-    requirement: dict
+    requirement: dict,
+    suppliers: list | None = None,
 ) -> SupplierDiscoveryResult:
 
     try:
@@ -22,10 +22,9 @@ def run_supplier_discovery_agent(
             )
 
         # 1. Discover suppliers
-        suppliers = search_suppliers(
-            product_service=product_service,
-            active_only=True
-        )
+        if not suppliers:
+            from tools.supplier.supplier_search import search_suppliers
+            suppliers = search_suppliers(product_service=product_service, active_only=True)
 
         if not suppliers:
             return SupplierDiscoveryResult(

@@ -19,6 +19,8 @@ public interface SupplierRepository extends JpaRepository<Supplier, UUID> {
 
     boolean existsByOrganizationIdAndContactEmail(UUID organizationId, String contactEmail);
 
+    java.util.List<Supplier> findAllByOrganizationIdAndStatus(UUID organizationId, SupplierStatus status);
+
     /** pattern is already lower-cased and wrapped in % by the service. */
     @Query("""
             select s from Supplier s

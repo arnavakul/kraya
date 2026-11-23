@@ -59,3 +59,4 @@ kraya:
 
   agents:
     evaluation-url: ${EVALUATION_AGENT_URL:http://localhost:8000}
+    url: ${AGENT_SERVICE_URL:http://127.0.0.1:8000}

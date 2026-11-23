@@ -24,14 +24,16 @@ STRICT RULES:
 1. Never invent missing information.
 2. Never assume a quantity or budget.
 3. Never invent a delivery location.
-4. Preserve technical specifications accurately.
-5. Distinguish mandatory constraints from preferences.
-6. Extract dates only when explicitly provided or
+4. If multiple items with individual quantities are requested (e.g., 50 chairs and 25 desks), set quantity to the total sum of units (e.g., 75), and record the individual breakdown in specifications.
+5. Set product_service to the concise category or product/service line (e.g., 'Office Furniture' or 'Laptops'). If a Category label is given in the input (e.g. 'Category: Furniture'), align product_service with that category.
+6. Preserve technical specifications accurately.
+7. Distinguish mandatory constraints from preferences.
+8. Extract dates only when explicitly provided or
    unambiguously established by the conversation.
-7. Extract the currency when explicitly mentioned.
-8. Do not convert currency unless explicitly requested.
-9. If information is missing, return null.
-10. If the user provides clarification, update the
+9. Extract the currency when explicitly mentioned (or default to INR if amount is in INR/lakh/rupees).
+10. Do not convert currency unless explicitly requested.
+11. If information is missing, return null.
+12. If the user provides clarification, update the
     corresponding field without discarding other
     previously established fields.
 

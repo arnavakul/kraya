@@ -6,6 +6,7 @@ class ProcurementState(TypedDict, total=False):
 
     # User input
     user_input: str
+    supplier_candidates_input: list[dict]
 
     # Intake Agent
     requirement_draft: Optional[dict]
